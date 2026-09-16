@@ -1,0 +1,8 @@
+# Option A: Standard MVS Modify command to refresh all policies (Preferred)
+MODIFY PAGENT,REFRESH
+
+# Short form variant of the Modify command
+F PAGENT,REFRESH
+
+# Option B: Force PAGENT to re-read specific TCP/IP image configurations
+F PAGENT,UPDATE
