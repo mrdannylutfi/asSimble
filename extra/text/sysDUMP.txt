@@ -1,0 +1,9 @@
+# Step A: Query the current status of all dump datasets
+DISPLAY DUMP,STATUS
+
+# Step B: Clear a full dataset (e.g., SYS1.DUMP01) to make it available again
+DUMP DSN=01,CLEAR
+
+# Step C: Dynamically update or reset the Dump Management options 
+#         (Re-reads the specified COUPLxx or DIAGxx allocation rules)
+SET DUMP=01
