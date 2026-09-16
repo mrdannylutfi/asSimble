@@ -1,0 +1,51 @@
+# -------------------------------------------------------------------
+# AT-TLS Rule for Secure Outbound CSSMTP Traffic
+# -------------------------------------------------------------------
+TTLSRule                      CSSMTP_Outbound_Secure
+{
+  LocalJobname                CSSMTP*          # Matches your CSSMTP started task
+  Direction                   Outbound
+  RemotePortRange             465              # Standard implicit TLS port
+  TTLSGroupActionRef          grp_Production_Sec
+  TTLSEnvironmentActionRef    env_CSSMTP_Client
+}
+
+# -------------------------------------------------------------------
+# Group Action: Enables AT-TLS Processing
+# -------------------------------------------------------------------
+TTLSGroupAction               grp_Production_Sec
+{
+  TTLSEnabled                 On
+  Trace                       2                # Log errors and basic handshake metrics
+}
+
+# -------------------------------------------------------------------
+# Environment Action: Configures Role and Certificates
+# -------------------------------------------------------------------
+TTLSEnvironmentAction         env_CSSMTP_Client
+{
+  HandshakeRole               Client
+  TTLSKeyringParms
+  {
+    Keyring                   SECURE.CRYPTO.KEYRING  # Mapped in RACF
+  }
+  TTLSEnvironmentAdvancedParmsRef env_adv_CSSMTP
+}
+
+# -------------------------------------------------------------------
+# Advanced Parameters: Restrict to TLS 1.3 and Strong Ciphers
+# -------------------------------------------------------------------
+TTLSEnvironmentAdvancedParms env_adv_CSSMTP
+{
+  TLSv1.3                     On
+  TLSv1.2                     Off              # Enforce modern crypto only
+  TLSv1.1                     Off
+  TLSv1.0                     Off
+  
+  # Enable hardware-accelerated z16 ChaCha20/AES-GCM ciphers
+  TTLSCipherParms
+  {
+    V3CipherSuites            TLS_AES_256_GCM_SHA384
+    V3CipherSuites            TLS_CHACHA20_POLY1305_SHA256
+  }
+}
