@@ -1,0 +1,77 @@
+       0000-MAIN-LOGIC.
+           OPEN INPUT EMP-FILE.
+           OPEN OUTPUT ERR-FILE.
+           
+           IF NOT STATUS-OK OR NOT ERR-FILE-OK
+               DISPLAY 'FATAL ERROR OPENING FILES.'
+               GOBACK
+           END-IF.
+           
+           PERFORM 1100-READ-NEXT-RECORD.
+           PERFORM 2000-PROCESS-RECORDS UNTIL END-OF-FILE.
+           
+           CLOSE EMP-FILE.
+           CLOSE ERR-FILE.
+           GOBACK.
+
+       2000-PROCESS-RECORDS.
+           MOVE IN-ID TO H-ID-TEXT.
+           COMPUTE H-ID-LEN = FUNCTION LENGTH(IN-ID).
+
+           MOVE IN-NAME TO H-NAME-TEXT.
+           INSPECT FUNCTION REVERSE(IN-NAME) 
+               TALLYING H-NAME-LEN FOR LEADING SPACES.
+           COMPUTE H-NAME-LEN = 200 - H-NAME-LEN.
+
+           MOVE IN-WAGE TO H-WAGE-TEXT.
+           COMPUTE H-WAGE-LEN = FUNCTION LENGTH(IN-WAGE).
+
+      *    VALIDATION CHECK EXAMPLE: FIELD MUST NOT BE COMPLETELY BLANK
+           IF IN-NAME = SPACES
+               MOVE 'VALIDATION FAILED: NAME IS BLANK' TO ERR-MSG
+               MOVE IN-ID TO ERR-DATA-ID
+               WRITE ERR-RECORD
+               PERFORM 1100-READ-NEXT-RECORD
+               EXIT PARAGRAPH
+           END-IF.
+
+      *    STREET NULL PROCESSING
+           IF IN-STREET = SPACES
+               SET STR-IS-NULL TO TRUE
+               MOVE ZERO TO H-STR-LEN
+           ELSE
+               SET STR-NOT-NULL TO TRUE
+               MOVE IN-STREET TO H-STR-TEXT
+               INSPECT FUNCTION REVERSE(IN-STREET) 
+                   TALLYING H-STR-LEN FOR LEADING SPACES
+               COMPUTE H-STR-LEN = 100 - H-STR-LEN
+           END-IF.
+
+      *    TELEPHONE NULL PROCESSING
+           IF IN-TELEPHONE = SPACES
+               SET TEL-IS-NULL TO TRUE
+               MOVE ZERO TO H-TEL-LEN
+           ELSE
+               SET TEL-NOT-NULL TO TRUE
+               MOVE IN-TELEPHONE TO H-TEL-TEXT
+               INSPECT FUNCTION REVERSE(IN-TELEPHONE) 
+                   TALLYING H-TEL-LEN FOR LEADING SPACES
+               COMPUTE H-TEL-LEN = 100 - H-TEL-LEN
+           END-IF.
+
+      *    EXECUTE DB2 EMBEDDED SQL INSERT
+           EXEC SQL
+               INSERT INTO YOUR_SCHEMA.EMPLOYEE_TABLE
+               ( ID, EMPLOYEE_NAME, WAGE, STREET, TELEPHONE )
+               VALUES
+               ( :H-ID, :H-EMP-NAME, :H-WAGE, 
+                 :H-STREET :NI-STREET, :H-TELEPHONE :NI-TELEPHONE )
+           END-EXEC.
+
+           IF SQLCODE NOT = 0
+               MOVE 'DB2 INSERT FAILED IN SQL ENGINE' TO ERR-MSG
+               MOVE IN-ID TO ERR-DATA-ID
+               WRITE ERR-RECORD
+           END-IF.
+
+           PERFORM 1100-READ-NEXT-RECORD.
