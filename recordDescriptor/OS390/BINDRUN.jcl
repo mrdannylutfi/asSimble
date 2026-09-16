@@ -63,7 +63,7 @@
 //         DD DSN=DSN1210.SDSNLOAD,DISP=SHR
 //SYSTSPRT DD SYSOUT=*
 //*-------------------------------------------------------------------*
-//* 🛠️ 这里是您的 200万数据大机源文件输入流 (带 BUFNO=30 异步预读调优)
+//*  Here: Your input stream for the source file containing 2 million records (optimized with BUFNO=30 for asynchronous read-ahead).
 //*-------------------------------------------------------------------*
 //INFILE   DD DSN=YOURHLQ.TEST.DATA.EMPINPUT,DISP=SHR,BUFNO=30
 //SYSOUT   DD SYSOUT=*
