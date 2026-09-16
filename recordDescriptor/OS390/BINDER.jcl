@@ -12,7 +12,7 @@
       ISOLATION(CS)                      +       
       CURRENTDATA(NO)                    +       
       RELEASE(COMMIT)                    +       
-      DEFER(PREPARE)                             <-- 专为 S/390 优化：推迟SQL编译以节省网络和内存
+      DEFER(PREPARE)                            <-- Optimized for S/390: Defer SQL compilation to save network and memory
 
  END
 /*
