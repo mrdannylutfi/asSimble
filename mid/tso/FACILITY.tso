@@ -1,0 +1,8 @@
+/* Define the core security profile */
+RDEFINE FACILITY SECURE.PAYLOAD UACC(NONE) AUDIT(ALL(READ))
+
+/* Permit the specific test user ID access to run the program */
+PERMIT SECURE.PAYLOAD CLASS(FACILITY) ID(TESTUSER) ACCESS(UPDATE)
+
+/* Refresh the in-storage profile tables */
+SETROPTS RACLIST(FACILITY) REFRESH
